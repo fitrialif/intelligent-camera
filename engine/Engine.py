@@ -11,6 +11,7 @@ import argparse
 import logging
 
 import tensorflow.contrib.slim as slim
+import tensorflow as tf
 
 from engine.InputDataProducer import InputDataProducer
 from engine.ResultProcessor import ResultProcessor
@@ -24,10 +25,11 @@ class Engine:
     def __init__(self):
         #create the input and output placeholders
         self.batchSize = 2
-        self.logits, self.inputData = ModelFactory.create(self.batchSize)
+        self.logits, self.inputData, self.session, self.labelMapper = \
+            ModelFactory.create(self.batchSize)
 
-        imageWidth  = self.logits.size()[2]
-        imageHeight = self.logits.size()[1]
+        imageWidth  = self.inputData.shape[2]
+        imageHeight = self.inputData.shape[1]
 
         #create an instance of the dataproducer
         self.dataProducer = InputDataProducer(imageWidth, imageHeight)
@@ -36,7 +38,8 @@ class Engine:
         self.resultProcessor = ResultProcessor()
 
     def run(self, inputImages):
-        batchCount = (len(inputImages) + self.batchSize - 1) / self.batchSize
+        batchCount = int((len(inputImages) + self.batchSize - 1) /
+                         self.batchSize)
 
         resultClasses = []
         for batch in range(batchCount):
@@ -52,13 +55,13 @@ class Engine:
             #session.run(inputImages) on logits -- executes the graph
             inputData = self.dataProducer.process(imageBatch)
 
-            logits = None
-            with tf.Session() as session:
-                logits = session.run([self.logits],
-                    feed_dict={self.inputData : inputData})
+            logits = self.session.run(self.logits,
+                feed_dict={self.inputData : inputData})
 
             #pass the logits to the results processor instance
-            resultClasses += self.resultProcessor.getLabels(logits[0:dynamicBatchSize])
+            print(logits)
+            resultClasses += self.resultProcessor.getLabels(
+                logits[0:dynamicBatchSize], self.labelMapper)
 
             #return list of inputImages and output of the results processor
 

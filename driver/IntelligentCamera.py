@@ -42,7 +42,7 @@ class IntelligentCamera:
     def classifyImage(self, imagePath):
         image = Image.open(imagePath)
 
-        results = self.engine.run(image)
+        results = self.engine.run([image])
 
         for resultImage, resultLabel in results:
             label = resultLabel['label']
@@ -53,6 +53,9 @@ class IntelligentCamera:
         fileName = os.path.split(inputImagePath)[1]
         outputPath = os.path.join(self.options['output'], label, fileName)
 
+        if not os.path.exists(os.path.dirname(outputPath)):
+            os.makedirs(os.path.dirname(outputPath))
+        
         resultImage.save(outputPath)
 
 

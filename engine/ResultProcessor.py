@@ -9,6 +9,7 @@
 
 import argparse
 import logging
+import numpy
 
 logger = logging.getLogger("ResultProcessor")
 
@@ -16,8 +17,18 @@ class ResultProcessor:
     def __init__(self):
         pass
 
-    def getLabels(self, pd):
-        #TODO: [probabilities] -> pick max entry -> class label
-        return [{"label": "cat"}]
+    def getLabels(self, pd, labelMapper):
+        #TODO: [probabilities] {batch, probs} -> pick max entry -> class label
+        batchSize  = pd.shape[0]
+        labelCount = pd.shape[1]
 
+        labels = []
+        for batchElement in range(batchSize):
+            probs = numpy.reshape(pd[batchElement:batchElement + 1, :], (labelCount))
+            mostLikelyLabelIndex = numpy.argmax(probs)
+            label = labelMapper.getLabelForLogit(mostLikelyLabelIndex)
+
+            labels.append({"label" : label})
+
+        return labels
 

@@ -10,6 +10,7 @@
 
 import argparse
 import logging
+import numpy
 
 from PIL import Image
 
@@ -17,7 +18,7 @@ logger = logging.getLogger("InputDataProducer")
 
 def getData(image, xSize, ySize):
     pixel = image.load()
-    data = np.array((1, ySize, xSize, 3))
+    data = numpy.zeros((1, ySize, xSize, 3))
     for x in range(xSize):
         for y in range(ySize):
             (red,green,blue) = pixel[x,y]
@@ -35,8 +36,8 @@ class InputDataProducer:
     def process(self, inputImages):
         outputData = []
         for inputImage in inputImages:
-            resizedImage = inputImage.resize(self.x, self.y)
-            outputData.append(getData(resizedImage, x, y))
+            resizedImage = inputImage.resize((self.x, self.y))
+            outputData.append(getData(resizedImage, self.x, self.y))
 
-        return np.concatenate(outputData)
+        return numpy.concatenate(outputData)
 
