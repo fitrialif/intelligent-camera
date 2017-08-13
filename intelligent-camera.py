@@ -1,5 +1,6 @@
 
 import argparse
+import logging
 
 from driver.IntelligentCamera import IntelligentCamera
 
@@ -11,8 +12,13 @@ def main():
                         help='The input directory to search for images in.')
     parser.add_argument('-o', '--output', default='./output',
                         help='The output directory to store processed images in.')
+    parser.add_argument('-v', '--verbose', default=False, action='store_true',
+                        help='Turn on debugging messages.')
 
     options = vars(parser.parse_args())
+
+    if options['verbose']:
+        logging.basicConfig(level=logging.DEBUG)
 
     intelligentCamera = IntelligentCamera(options)
 

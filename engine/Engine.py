@@ -12,8 +12,9 @@ import logging
 
 import tensorflow.contrib.slim as slim
 
-import InputDataProducer.InputDataProducer as InputDataProducer
-import ResultProcessor.ResultProcessor as ResultProcessor
+from engine.InputDataProducer import InputDataProducer
+from engine.ResultProcessor import ResultProcessor
+from engine.ModelFactory import ModelFactory
 
 
 logger = logging.getLogger("Engine")
@@ -21,11 +22,14 @@ logger = logging.getLogger("Engine")
 
 class Engine:
     def __init__(self):
-        #create an instance of the dataproducer
-        self.dataProducer = InputDataProducer()
-        
         #create the input and output placeholders
         self.logits, self.inputData = ModelFactory.create()
+
+        imageWidth  = self.logits.size()[2]
+        imageHeight = self.logits.size()[1]
+
+        #create an instance of the dataproducer
+        self.dataProducer = InputDataProducer(imageWidth, imageHeight)
 
         #create an instance of the result processor
         self.resultProcessor = ResultProcessor()
@@ -40,12 +44,12 @@ class Engine:
         with tf.Session() as session:
             logits = session.run([self.logits],
                 feed_dict={self.inputData : inputData})
-        
+
         #pass the logits to the results processor instance
         resultClasses = self.resultProcessor.getLabels(logits)
 
         #return list of inputImages and output of the results processor
-        
+
         return inputImages, resultClasses
 
 

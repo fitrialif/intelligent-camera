@@ -12,7 +12,7 @@ import argparse
 import logging
 
 import tensorflow as tf
-import tensorflow.contrib.slim as slim
+from models.InceptionResnetV2 import inception_resnet_v2
 
 logger = logging.getLogger("ModelFactory")
 
@@ -25,9 +25,9 @@ class ModelFactory:
         #call the inception_resnet_v2 function
 
         inputData = tf.placeholder(tf.float32, [128, 256, 256, 3])
-        
-        logits, endpts = slim.inception_resnet_v2(inputData, 
-                                                    num_classes=1, 
+
+        logits, endpts = inception_resnet_v2(inputData,
+                                                    num_classes=1,
                                                     is_training=False,
                                                     dropout_keep_prob=0.8,
                                                     reuse=None,
@@ -41,5 +41,5 @@ class ModelFactory:
 
         return logits, inputData
 
-        
-        
+
+

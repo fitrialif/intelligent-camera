@@ -1,8 +1,13 @@
 
-import imghdr
+
 from engine.Engine import Engine
+
 from PIL import Image
+
+import imghdr
+
 import os
+import logging
 
 def isValidImage(path):
     if imghdr.what(path) == None:
@@ -10,6 +15,7 @@ def isValidImage(path):
 
     return True
 
+logger = logging.getLogger("IntelligentCamera")
 
 class IntelligentCamera:
     def __init__(self, options):
@@ -28,6 +34,7 @@ class IntelligentCamera:
             for fileName in fileList:
                 path = os.path.join(directoryName, fileName)
                 if isValidImage(path):
+                    logger.info("Found image to process '" + path + "'")
                     images.append(path)
 
         return images
