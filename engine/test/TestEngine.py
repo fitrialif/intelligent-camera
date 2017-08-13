@@ -7,7 +7,6 @@ class EngineTester(unittest.TestCase):
     def setUp(self):
         self.engine = Engine()
 
-
 class TestEmptyImageList(EngineTester):
     def runTest(self):
         results = self.engine.run([])

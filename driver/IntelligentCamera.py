@@ -2,6 +2,7 @@
 import imghdr
 from engine.Engine import Engine
 from PIL import Image
+import os
 
 def isValidImage(path):
     if imghdr.what(path) == None:
@@ -23,7 +24,7 @@ class IntelligentCamera:
 
     def findImages(self):
         images = []
-        for directoryName, subdirectoryList, fileList in os.walk(options['input']):
+        for directoryName, subdirectoryList, fileList in os.walk(self.options['input']):
             for fileName in fileList:
                 path = os.path.join(directoryName, fileName)
                 if isValidImage(path):
@@ -32,7 +33,7 @@ class IntelligentCamera:
         return images
 
     def classifyImage(self, imagePath):
-        image = Image(imagePath)
+        image = Image.open(imagePath)
 
         results = self.engine.run(image)
 
