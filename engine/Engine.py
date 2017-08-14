@@ -24,7 +24,7 @@ logger = logging.getLogger("Engine")
 class Engine:
     def __init__(self):
         #create the input and output placeholders
-        self.batchSize = 2
+        self.batchSize = 6
         self.logits, self.inputData, self.session, self.labelMapper = \
             ModelFactory.create(self.batchSize)
 
@@ -42,9 +42,13 @@ class Engine:
                          self.batchSize)
 
         resultClasses = []
+        logger.info("Batch count: " + str(batchCount))
         for batch in range(batchCount):
             batchBegin = batch * self.batchSize
             batchEnd   = min(len(inputImages), batchBegin + self.batchSize)
+            logger.info("Processing from " + str(batchBegin) + " to " 
+                    + str(batchEnd))
+            
             imageBatch = inputImages[batchBegin:batchEnd]
 
             dynamicBatchSize = batchEnd - batchBegin

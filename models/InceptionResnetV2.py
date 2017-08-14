@@ -26,6 +26,7 @@ from __future__ import print_function
 
 
 import tensorflow as tf
+from models.InceptionPreprocessing import preprocess_for_eval
 
 slim = tf.contrib.slim
 
@@ -124,6 +125,19 @@ def inception_resnet_v2_base(inputs,
       or if the output_stride is not 8 or 16, or if the output_stride is 8 and
       we request an end point after 'PreAuxLogits'.
   """
+  preProcessedInputs = []
+  for batch in range(inputs.shape[0]):
+    imageHeight = int(inputs.shape[1])
+    imageWidth = int(inputs.shape[2])
+    imageChannels = int(inputs.shape[3])
+    image = tf.slice(inputs, [batch, 0, 0, 0], [1, imageHeight, imageWidth, imageChannels])
+    reshapedImage = tf.reshape(image, [imageHeight, imageWidth, imageChannels])
+    preprocessedImage = preprocess_for_eval(reshapedImage, height=imageHeight, width=imageWidth, scope=None)
+    preprocessedImage = tf.reshape(preprocessedImage, [1, imageHeight, imageWidth, imageChannels])
+    preProcessedInputs.append(preprocessedImage)
+
+  inputs = tf.concat(preProcessedInputs, 0)
+
   if output_stride != 8 and output_stride != 16:
     raise ValueError('output_stride must be 8 or 16.')
 

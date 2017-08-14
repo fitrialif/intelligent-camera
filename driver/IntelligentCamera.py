@@ -25,8 +25,7 @@ class IntelligentCamera:
     def run(self):
         images = self.findImages()
 
-        for image in images:
-            self.classifyImage(image)
+        self.classifyImages(images)
 
     def findImages(self):
         images = []
@@ -39,14 +38,16 @@ class IntelligentCamera:
 
         return images
 
-    def classifyImage(self, imagePath):
-        image = Image.open(imagePath)
+    def classifyImages(self, imagePaths):
+        images = [Image.open(imagePath) for imagePath in imagePaths]
 
-        results = self.engine.run([image])
+        results = self.engine.run(images)
 
+        index = 0
         for resultImage, resultLabel in results:
             label = resultLabel['label']
-            self.saveImage(resultImage, label, imagePath)
+            self.saveImage(resultImage, label, imagePaths[index])
+            index += 1
 
     def saveImage(self, resultImage, label, inputImagePath):
 

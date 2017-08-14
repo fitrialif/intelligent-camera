@@ -26,9 +26,21 @@ class ResultProcessor:
         for batchElement in range(batchSize):
             probs = numpy.reshape(pd[batchElement:batchElement + 1, :], (labelCount))
             mostLikelyLabelIndex = numpy.argmax(probs)
+            logger.info("Most like label: " + str(mostLikelyLabelIndex) \
+                    + " with score: " + str(probs[mostLikelyLabelIndex]))
             label = labelMapper.getLabelForLogit(mostLikelyLabelIndex)
 
-            labels.append({"label" : label})
+            top5LabelIndices = numpy.argpartition(probs, -5)[-5:]
+
+            top5LabelIndices = reversed(top5LabelIndices[numpy.argsort(probs[top5LabelIndices])])
+
+            top5Labels = [labelMapper.getLabelForLogit(index) for index in top5LabelIndices]
+
+            result = {"label" : label, "top-5-labels" : top5Labels}
+            
+            logger.info(" result: " + str(result))
+
+            labels.append(result)
 
         return labels
 

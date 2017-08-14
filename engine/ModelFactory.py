@@ -31,14 +31,14 @@ class ModelFactory:
         imageHeight = inception_resnet_v2.default_image_size
         imageWidth  = inception_resnet_v2.default_image_size
 
-        inputData = tf.placeholder(tf.float32,
+        inputData = tf.placeholder(tf.uint8,
             [batchSize, imageHeight, imageWidth, 3])
 
         with tf.contrib.slim.arg_scope(inception_resnet_v2_arg_scope()):
             logits, endpts = inception_resnet_v2(inputData,
                                                  num_classes=1001,
                                                  is_training=False,
-                                                 dropout_keep_prob=1.0,
+                                                 dropout_keep_prob=0.8,
                                                  reuse=None,
                                                  scope='InceptionResnetV2',
                                                  create_aux_logits=True)
@@ -48,11 +48,6 @@ class ModelFactory:
         #load the input placeholder with the ckpt file
         session = tf.Session()
         restorer.restore(session, inceptionResnetV2Path)
-        #tf.saved_model.loader.load(session, ["InceptionResnetV2"],
-        #                           inceptionResnetV2Path)
-        #variablesToRestore = tf.contrib.slim.get_variables_to_restore()
-        #l = session.run([logits],
-        #    feed_dict={inputData : numpy.zeros((batchSize, imageHeight, imageWidth, 3))})
 
         return logits, inputData, session, ImageNet()
 
